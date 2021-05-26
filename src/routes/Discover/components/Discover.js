@@ -4,7 +4,6 @@ import DiscoverBlock from './DiscoverBlock/components/DiscoverBlock';
 import '../styles/_discover.scss';
 import api from '../../../config'
 import axios from 'axios';
-import limit from './DiscoverBlock/components/DiscoverBlock';
 
 function Discover () {
 
