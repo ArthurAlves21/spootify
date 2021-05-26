@@ -4,6 +4,7 @@ import DiscoverBlock from './DiscoverBlock/components/DiscoverBlock';
 import '../styles/_discover.scss';
 import api from '../../../config'
 import axios from 'axios';
+import limit from './DiscoverBlock/components/DiscoverBlock';
 
 function Discover () {
 
@@ -12,8 +13,10 @@ function Discover () {
     const [genres, setGenres] = useState("");
     const [releases, setReleases] = useState("");
     const [token, setToken] = useState("");
+    const [isLoading, setIsLoading] = useState("");
 
     useEffect(() => {
+      setIsLoading(true);
         axios('https://accounts.spotify.com/api/token', {
           headers: {
             'Content-Type' : 'application/x-www-form-urlencoded',
@@ -26,21 +29,21 @@ function Discover () {
           console.log(tokenResponse.data.access_token)
           setToken(tokenResponse.data.access_token)
 
-          fetch("https://api.spotify.com/v1/browse/new-releases", {
+          fetch("https://api.spotify.com/v1/browse/new-releases?limit=50", {
             method: "GET",
             headers: {Authorization: `Bearer ${tokenResponse.data.access_token}`}
           })
           .then(response => response.json())
           .then((data) => {setReleases(data.albums.items)})
 
-          fetch("https://api.spotify.com/v1/browse/categories", {
+          fetch("https://api.spotify.com/v1/browse/categories?limit=50", {
             method: "GET",
             headers: {Authorization: `Bearer ${tokenResponse.data.access_token}`}
           })
           .then(response => response.json())
           .then((data) => {setGenres(data.categories.items)})
 
-          fetch("https://api.spotify.com/v1/browse/featured-playlists", {
+          fetch("https://api.spotify.com/v1/browse/featured-playlists?limit=50", {
             method: "GET",
             headers: {Authorization: `Bearer ${tokenResponse.data.access_token}`}
           })
@@ -48,6 +51,7 @@ function Discover () {
           .then((data) => {setPlaylist(data.playlists.items)})
         });
     }, []); 
+
 
 
     const data = {
@@ -58,11 +62,15 @@ function Discover () {
 
     const { newReleases, playlists, categories } = data;
 
+    useEffect(() => {
+      setIsLoading(false)
+    })
+
     return (
       <div className="discover">
-        <DiscoverBlock text="RELEASED THIS WEEK" id="released" data={newReleases} />
-        <DiscoverBlock text="FEATURED PLAYLISTS" id="featured" data={playlists} /> 
-        <DiscoverBlock text="BROWSE" id="browse" data={categories} imagesKey="icons" />
+        <DiscoverBlock text="RELEASED THIS WEEK" id="released" data={newReleases} isLoading={isLoading} />
+        <DiscoverBlock text="FEATURED PLAYLISTS" id="featured" data={playlists} isLoading={isLoading}/> 
+        <DiscoverBlock text="BROWSE" id="browse" data={categories} imagesKey="icons" isLoading={isLoading}/>
       </div>
     );
 }

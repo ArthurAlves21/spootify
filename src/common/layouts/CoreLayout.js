@@ -3,7 +3,7 @@ import Header from '../components/Header';
 import SideBar from '../components/SideBar';
 import Player from '../components/Player';
 
-function CoreLayout({ children , history }) {
+function CoreLayout({ children , history, isLoading }) {
   return (
     <div className="main">
       <SideBar />
