@@ -15,7 +15,7 @@ function Discover () {
 
     useEffect(() => {
         axios('https://accounts.spotify.com/api/token', {
-          headers: { 
+          headers: {
             'Content-Type' : 'application/x-www-form-urlencoded',
             'Authorization' : 'Basic ' + btoa(api.api.clientId + ':' + api.api.clientSecret)      
           },
@@ -23,37 +23,30 @@ function Discover () {
           method: 'POST'
         })
         .then(tokenResponse => {      
-          setToken(tokenResponse.data.access_token);
+          console.log(tokenResponse.data.access_token)
+          setToken(tokenResponse.data.access_token)
 
-          const releasesApi = axios('https://api.spotify.com/v1/browse/new-releases', {
-            method: 'GET',
-            headers: { 'Authorization' : 'Bearer ' + tokenResponse.data.access_token},
+          fetch("https://api.spotify.com/v1/browse/new-releases", {
+            method: "GET",
+            headers: {Authorization: `Bearer ${tokenResponse.data.access_token}`}
           })
-  
-          const genreApi = axios('https://api.spotify.com/v1/browse/categories', {
-            method: 'GET',  
-            headers: { 'Authorization' : 'Bearer ' + tokenResponse.data.access_token},
-          })
-          
+          .then(response => response.json())
+          .then((data) => {setReleases(data.albums.items)})
 
-          const playlistApi = axios(`https://api.spotify.com/v1/browse/featured-playlists`, {
-            method: 'GET',
-            headers: { 'Authorization' : 'Bearer ' + token}, 
+          fetch("https://api.spotify.com/v1/browse/categories", {
+            method: "GET",
+            headers: {Authorization: `Bearer ${tokenResponse.data.access_token}`}
           })
+          .then(response => response.json())
+          .then((data) => {setGenres(data.categories.items)})
 
-          axios.all([playlistApi, genreApi, releasesApi]).then(axios.spread((...responses) => {
-            setReleases(
-              responses[2].data.albums.items
-            )
-            setGenres(
-              responses[1].data.categories.items
-            )
-            setPlaylist(
-              responses[0].data.playlists.items
-            )
-          }))
+          fetch("https://api.spotify.com/v1/browse/featured-playlists", {
+            method: "GET",
+            headers: {Authorization: `Bearer ${tokenResponse.data.access_token}`}
+          })
+          .then(response => response.json())
+          .then((data) => {setPlaylist(data.playlists.items)})
         });
-        console.log(playlist);
     }, []); 
 
 
